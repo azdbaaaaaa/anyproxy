@@ -1,5 +1,9 @@
 AnyProxy
 ==========
+基于anyproxy进行二次开发：
+1. 保存resBody
+2. 扩展rule_intercept_some_https_time.js, 利用jsonpath进行mock
+
 
 [![NPM version][npm-image]][npm-url]
 [![node version][node-image]][node-url]

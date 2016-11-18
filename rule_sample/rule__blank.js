@@ -23,7 +23,7 @@ module.exports = {
     //是否截获https请求
     //should intercept https request, or it will be forwarded to real server
     shouldInterceptHttpsReq :function(req){
-        return false;
+        return true;
     },
 
     //是否在本地直接发送响应（不再向服务器发出请求）
@@ -83,7 +83,13 @@ module.exports = {
     //替换服务器响应的http状态码
     //replace the statusCode before it's sent to the user
     replaceResponseStatusCode: function(req,res,statusCode){
-    	var newStatusCode = statusCode;
+        // console.log(req.headers.host);
+        // if (req.headers.host == "mobile.mmbang.net") {
+        //     var newStatusCode = "000";
+        // } else {
+        //     var newStatusCode = statusCode;
+        // }
+        var newStatusCode = statusCode;
     	return newStatusCode;
     },
 
@@ -100,7 +106,75 @@ module.exports = {
     //you may return either a Buffer or a string
     //serverResData is a Buffer. for those non-unicode reponse , serverResData.toString() should not be your first choice.
     replaceServerResDataAsync: function(req,res,serverResData,callback){
-        callback(serverResData);
+        // console.log(req.url);
+        // console.log(serverResData.toString());
+        // callback(serverResData);
+        // 判断是否
+        if ('content-type' in res.headers) {
+            if (res.headers['content-type'].split(";")[0] == "application/json") {   
+                var jp = require('jsonpath');
+                var URL = require('url');
+                var resBody = JSON.parse(serverResData.toString());
+                var fullurl = req.headers.host + URL.parse(req.url).pathname;
+                fullurl = fullurl.replace(/\/$/,"");
+
+                // 默认取前99个满足jsonpath条件的数据
+                // var count = 99;
+
+                // 局部修改的json数据
+                var local_mock = {
+                    "mobile.mmbang.com/api18": {
+                        '$..user_name': '我是修改过的用户名字',
+                        '$..baby_name': '我是修改过的宝宝名字',
+                        '$..lollipop.target_url': 'com.iyaya.mmbang://app/v1/webview/advanced?url=https://www.baidu.com',
+                        '$.message': '我是/api18这个接口修改的message',
+                        // '$..flowers': null,
+                    },
+                    "log.mmbang.com/catch": {
+                        '$.message': '我是/catch接口修改过的message'
+                    },
+
+                };
+
+                // 全局修改的list
+                var global_mock = {
+                    '$.message': '我是全局修改过的message',
+                    // '$.success': '我是修改过的success'
+                };
+
+                // 根据传入的jsonpath表达式替换resBody的值
+                function replaceData(jsonpath) {
+                    for (var key in jsonpath){
+                        var pathExpressionList = jp.paths(resBody, key)
+                        for (var i = 0; i < pathExpressionList.length; i++) {
+                            var pathExpression = jp.stringify(pathExpressionList[i])
+                            jp.value(resBody, pathExpression, jsonpath[key]);
+                        };
+                    };
+                };
+
+                // 循环替换global_mock中的值  PS:会替换掉局部修改的json数据
+                replaceData(global_mock);
+
+                // 循环替换local_mock中的值
+                for (var path in local_mock){
+                    path_temp = path.replace(/\/$/,"");
+                    if (fullurl == path_temp) {
+                        console.log("==> will replace:" + path);
+                        replaceData(local_mock[path]);
+                        // console.log(resBody);
+                    } else {
+                        console.log("==> will not replace:" + path);
+                        console.log("==> fullurl:" + fullurl);
+                    };
+                };
+                callback(JSON.stringify(resBody));
+            };
+        } else {
+            // console.log(resBody);
+            // callback(JSON.stringify(resBody));
+            callback(serverResData);            
+        };
     },
 
     //Deprecated    

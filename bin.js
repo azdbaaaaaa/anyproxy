@@ -24,6 +24,7 @@ program
     .option('-c, --clear', 'clear all the tmp certificates')
     .option('-o, --global', 'set as global proxy for system')
     .option('install', '[alpha] install node modules')
+    .option('--replace [value]', 'replace XXX')
     .parse(process.argv);
 
 if(program.clear){
@@ -94,6 +95,7 @@ if(program.clear){
         disableWebInterface : false,
         setAsGlobalProxy    : program.global,
         interceptHttps      : program.intercept,
-        silent              : program.silent
+        silent              : program.silent,
+        replace             : program.replace
     });
 }
