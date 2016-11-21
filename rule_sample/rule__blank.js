@@ -110,71 +110,71 @@ module.exports = {
         // console.log(serverResData.toString());
         // callback(serverResData);
         // 判断是否
-        if ('content-type' in res.headers) {
-            if (res.headers['content-type'].split(";")[0] == "application/json") {   
-                var jp = require('jsonpath');
-                var URL = require('url');
-                var resBody = JSON.parse(serverResData.toString());
-                var fullurl = req.headers.host + URL.parse(req.url).pathname;
-                fullurl = fullurl.replace(/\/$/,"");
+        // if ('content-type' in res.headers) {
+        //     if (res.headers['content-type'].split(";")[0] == "application/json") {   
+        //         var jp = require('jsonpath');
+        //         var URL = require('url');
+        //         var resBody = JSON.parse(serverResData.toString());
+        //         var fullurl = req.headers.host + URL.parse(req.url).pathname;
+        //         fullurl = fullurl.replace(/\/$/,"");
 
-                // 默认取前99个满足jsonpath条件的数据
-                // var count = 99;
+        //         // 默认取前99个满足jsonpath条件的数据
+        //         // var count = 99;
 
-                // 局部修改的json数据
-                var local_mock = {
-                    "mobile.mmbang.com/api18": {
-                        '$..user_name': '我是修改过的用户名字',
-                        '$..baby_name': '我是修改过的宝宝名字',
-                        '$..lollipop.target_url': 'com.iyaya.mmbang://app/v1/webview/advanced?url=https://www.baidu.com',
-                        '$.message': '我是/api18这个接口修改的message',
-                        // '$..flowers': null,
-                    },
-                    "log.mmbang.com/catch": {
-                        '$.message': '我是/catch接口修改过的message'
-                    },
+        //         // 局部修改的json数据
+        //         var local_mock = {
+        //             "mobile.mmbang.com/api18": {
+        //                 '$..user_name': '我是修改过的用户名字',
+        //                 '$..baby_name': '我是修改过的宝宝名字',
+        //                 '$..lollipop.target_url': 'com.iyaya.mmbang://app/v1/webview/advanced?url=https://www.baidu.com',
+        //                 '$.message': '我是/api18这个接口修改的message',
+        //                 // '$..flowers': null,
+        //             },
+        //             "log.mmbang.com/catch": {
+        //                 '$.message': '我是/catch接口修改过的message'
+        //             },
 
-                };
+        //         };
 
-                // 全局修改的list
-                var global_mock = {
-                    '$.message': '我是全局修改过的message',
-                    // '$.success': '我是修改过的success'
-                };
+        //         // 全局修改的list
+        //         var global_mock = {
+        //             '$.message': '我是全局修改过的message',
+        //             // '$.success': '我是修改过的success'
+        //         };
 
-                // 根据传入的jsonpath表达式替换resBody的值
-                function replaceData(jsonpath) {
-                    for (var key in jsonpath){
-                        var pathExpressionList = jp.paths(resBody, key)
-                        for (var i = 0; i < pathExpressionList.length; i++) {
-                            var pathExpression = jp.stringify(pathExpressionList[i])
-                            jp.value(resBody, pathExpression, jsonpath[key]);
-                        };
-                    };
-                };
+        //         // 根据传入的jsonpath表达式替换resBody的值
+        //         function replaceData(jsonpath) {
+        //             for (var key in jsonpath){
+        //                 var pathExpressionList = jp.paths(resBody, key)
+        //                 for (var i = 0; i < pathExpressionList.length; i++) {
+        //                     var pathExpression = jp.stringify(pathExpressionList[i])
+        //                     jp.value(resBody, pathExpression, jsonpath[key]);
+        //                 };
+        //             };
+        //         };
 
-                // 循环替换global_mock中的值  PS:会替换掉局部修改的json数据
-                replaceData(global_mock);
+        //         // 循环替换global_mock中的值  PS:会替换掉局部修改的json数据
+        //         replaceData(global_mock);
 
-                // 循环替换local_mock中的值
-                for (var path in local_mock){
-                    path_temp = path.replace(/\/$/,"");
-                    if (fullurl == path_temp) {
-                        console.log("==> will replace:" + path);
-                        replaceData(local_mock[path]);
-                        // console.log(resBody);
-                    } else {
-                        console.log("==> will not replace:" + path);
-                        console.log("==> fullurl:" + fullurl);
-                    };
-                };
-                callback(JSON.stringify(resBody));
-            };
-        } else {
-            // console.log(resBody);
-            // callback(JSON.stringify(resBody));
+        //         // 循环替换local_mock中的值
+        //         for (var path in local_mock){
+        //             path_temp = path.replace(/\/$/,"");
+        //             if (fullurl == path_temp) {
+        //                 console.log("==> will replace:" + path);
+        //                 replaceData(local_mock[path]);
+        //                 // console.log(resBody);
+        //             } else {
+        //                 console.log("==> will not replace:" + path);
+        //                 console.log("==> fullurl:" + fullurl);
+        //             };
+        //         };
+        //         callback(JSON.stringify(resBody));
+        //     };
+        // } else {
+        //     // console.log(resBody);
+        //     // callback(JSON.stringify(resBody));
             callback(serverResData);            
-        };
+        // };
     },
 
     //Deprecated    
@@ -185,7 +185,7 @@ module.exports = {
     //在请求返回给用户前的延迟时间
     //add a pause before sending response to user
     pauseBeforeSendingResponse : function(req,res){
-    	var timeInMS = 1; //delay all requests for 1ms
+    	var timeInMS = 0; //delay all requests for 1ms
     	return timeInMS; 
     }
 
