@@ -23,9 +23,10 @@ module.exports = {
         //     callback(serverResData);
         // }
 
-        console.log("Start replaceServerResDataAsync");
+        
         //update by zhoudongbin
         //
+        console.log("Start replaceServerResDataAsync");
         if (res.headers['content-type']) {
             var mime_type = res.headers['content-type'].split(";")[0];
             // 替换json数据
@@ -44,21 +45,19 @@ module.exports = {
                 // 局部修改的json数据
                 var local_mock = {
                     "mobile.mmbang.com/api18": {
-                        '$..user_name': '我是修改过的用户名字',
-                        '$..baby_name': '我是修改过的宝宝名字',
-                        '$..lollipop.target_url': 'com.iyaya.mmbang://app/v1/webview/advanced?url=https://www.baidu.com',
-                        '$.message': '我是/api18这个接口修改的message',
-                        // '$..flowers': null,
+                        "$..user_name": "我是修改过的用户名字",
+                        "$..baby_name": "我是修改过的宝宝名字",
+                        "$..lollipop.target_url": "com.iyaya.mmbang://app/v1/webview/advanced?url=https://www.baidu.com",
+                        "$.message": "我是/api18这个接口修改的message"
                     },
                     "log.mmbang.com/catch": {
-                        '$.message': '我是/catch接口修改过的message'
-                    },
-
+                        "$.message": "我是/catch接口修改过的message"
+                    }
                 };
 
                 // 全局修改的list
                 var global_mock = {
-                    '$.message': '我是全局修改过的message',
+                    "$.message": "我是全局修改过的message",
                     // '$.success': '我是修改过的success'
                 };
 
@@ -74,20 +73,24 @@ module.exports = {
                 };
 
                 // 循环替换global_mock中的值  PS:会替换掉局部修改的json数据
-                replaceData(global_mock);
+                if (global_mock) {
+                    replaceData(global_mock);
+                };
 
                 // 循环替换local_mock中的值
-                for (var path in local_mock){
-                    path_temp = path.replace(/\/$/,"");
-                    if (fullurl == path_temp) {
-                        console.log("will replace:" + path);
-                        replaceData(local_mock[path]);
-                        break;
-                        // console.log(resBody);
-                    } else {
-                        console.log("will not replace:" + path + " && fullurl:" + fullurl);
+                if (local_mock) {
+                    for (var path in local_mock){
+                        path_temp = path.replace(/\/$/,"");
+                        if (fullurl == path_temp) {
+                            console.log("will replace:" + path);
+                            replaceData(local_mock[path]);
+                            break;
+                            // console.log(resBody);
+                        } else {
+                            console.log("will not replace:" + path + " && fullurl:" + fullurl);
+                        };
                     };
-                };
+                }
                 callback(JSON.stringify(resBody));
             } else if( mime_type == "application/html"){
                 console.log("MIME is html, SKIP");
